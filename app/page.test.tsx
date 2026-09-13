@@ -39,7 +39,7 @@ describe('Real Rabota landing', () => {
       'Страны и форматы работы',
       'Как проходит трудоустройство',
       'Актуальные программы',
-      'Визовая поддержка без слепых зон',
+      'Визовое сопровождение',
       'Истории клиентов',
       'Частые вопросы',
       'Получите консультацию',
@@ -127,9 +127,36 @@ describe('Real Rabota landing', () => {
     const { container } = render(<Home />);
 
     ['Европа', 'Польша', 'Литва', 'Латвия', 'Эстония', 'США', 'Канада'].forEach(
-      (country) => expect(screen.getByRole('heading', { name: country })).toBeInTheDocument(),
+      (country) => expect(screen.getByRole('button', {
+        name: new RegExp(`${country} — Смотреть варианты работы`),
+      })).toBeInTheDocument(),
     );
     expect(container.querySelectorAll('.direction-flag img')).toHaveLength(7);
+  });
+
+  it('opens country-specific job options from a destination card', async () => {
+    const user = userEvent.setup();
+    render(<Home />);
+
+    await user.click(screen.getByRole('button', { name: /Польша/ }));
+
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Варианты работы в Польше' })).toBeInTheDocument();
+    expect(screen.getByText('Строитель')).toBeInTheDocument();
+    expect(screen.getByText('5 500–8 500 PLN/мес.')).toBeInTheDocument();
+    expect(screen.getByText(/Точные условия зависят от работодателя/)).toBeInTheDocument();
+  });
+
+  it('localizes the country job dialog in Kazakh', async () => {
+    const user = userEvent.setup();
+    render(<Home />);
+
+    await user.click(screen.getByRole('button', { name: 'ҚАЗ' }));
+    await user.click(screen.getByRole('button', { name: /Польша/ }));
+
+    expect(screen.getByRole('heading', { name: 'Польшадағы жұмыс нұсқалары' })).toBeInTheDocument();
+    expect(screen.getByText('Құрылысшы')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Кеңес алу' })).toHaveAttribute('href', '#consultation');
   });
 
   it('switches the complete interface to Kazakh without reloading', async () => {
@@ -141,7 +168,7 @@ describe('Real Rabota landing', () => {
     expect(
       screen.getByRole('heading', { name: 'Өмір географиясын өзгертетін жұмыс' }),
     ).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Визалық қолдау — бәрі анық' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Визалық сүйемелдеу' })).toBeInTheDocument();
     expect(screen.getAllByRole('button', { name: 'Кеңес алу' }).length).toBeGreaterThan(0);
     expect(window.location.search).toBe('?lang=kk');
   });

@@ -1,7 +1,18 @@
 'use client';
 
+/* oxlint-disable next/no-img-element -- country artwork and tiny local flag assets are pre-optimized */
+
 import { useState } from 'react';
-import { ArrowUpRight, MessageCircle } from 'lucide-react';
+import {
+  ArrowUpRight,
+  BriefcaseBusiness,
+  Clock3,
+  FileCheck2,
+  House,
+  MessageCircle,
+  ShieldCheck,
+  X,
+} from 'lucide-react';
 
 import {
   Accordion,
@@ -10,6 +21,15 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select';
 import type { Locale } from '@/lib/i18n';
@@ -151,5 +171,140 @@ export function LanguageSwitcher({ locale, label, onChange }: LanguageSwitcherPr
         ҚАЗ
       </button>
     </fieldset>
+  );
+}
+
+type CountryCardCopy = {
+  label: string;
+  imageAlt: string;
+  text: string;
+  tags: ReadonlyArray<string>;
+  dialogTitle: string;
+  dialogLead: string;
+  conditions: ReadonlyArray<readonly [string, string]>;
+  jobs: ReadonlyArray<readonly [string, string, string]>;
+};
+
+type CountryDialogLabels = {
+  open: string;
+  kicker: string;
+  conditions: string;
+  jobs: string;
+  salary: string;
+  cta: string;
+  close: string;
+  disclaimer: string;
+};
+
+type CountryJobsDialogProps = {
+  country: CountryCardCopy;
+  image: string;
+  flag: string;
+  cardClassName: string;
+  labels: CountryDialogLabels;
+};
+
+const conditionIcons = [Clock3, FileCheck2, House];
+
+export function CountryJobsDialog({
+  country,
+  image,
+  flag,
+  cardClassName,
+  labels,
+}: CountryJobsDialogProps) {
+  return (
+    <Dialog>
+      <DialogTrigger
+        render={
+          <button
+            type="button"
+            className={`direction-card ${cardClassName}`}
+            aria-label={`${country.label} — ${labels.open}`}
+          />
+        }
+      >
+        <span className="direction-media">
+          <img
+            src={image}
+            width="1200"
+            height="800"
+            loading="lazy"
+            decoding="async"
+            alt={country.imageAlt}
+          />
+          <span className="direction-card-top">
+            <span className="direction-flag">
+              <img src={flag} width="34" height="24" alt="" aria-hidden="true" />
+            </span>
+            <ArrowUpRight aria-hidden="true" />
+          </span>
+        </span>
+        <span className="direction-copy">
+          <span className="direction-title">{country.label}</span>
+          <span className="direction-description">{country.text}</span>
+          <span className="tag-row">
+            {country.tags.map((tag) => <span key={tag}>{tag}</span>)}
+          </span>
+        </span>
+      </DialogTrigger>
+
+      <DialogContent className="jobs-dialog" showCloseButton={false}>
+        <DialogClose className="jobs-dialog-close" aria-label={labels.close}>
+          <X aria-hidden="true" />
+        </DialogClose>
+        <DialogHeader className="jobs-dialog-header">
+          <div className="jobs-dialog-country">
+            <span className="jobs-dialog-flag"><img src={flag} width="38" height="27" alt="" aria-hidden="true" /></span>
+            <span>{labels.kicker}</span>
+          </div>
+          <DialogTitle className="jobs-dialog-title">{country.dialogTitle}</DialogTitle>
+          <DialogDescription className="jobs-dialog-lead">{country.dialogLead}</DialogDescription>
+        </DialogHeader>
+
+        <section className="jobs-dialog-section" aria-labelledby={`conditions-${country.label}`}>
+          <h3 id={`conditions-${country.label}`}>{labels.conditions}</h3>
+          <div className="job-condition-grid">
+            {country.conditions.map(([title, text], index) => {
+              const Icon = conditionIcons[index];
+              return (
+                <div className="job-condition" key={title}>
+                  <span><Icon aria-hidden="true" /></span>
+                  <div><small>{title}</small><strong>{text}</strong></div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        <section className="jobs-dialog-section" aria-labelledby={`jobs-${country.label}`}>
+          <h3 id={`jobs-${country.label}`}>{labels.jobs}</h3>
+          <div className="job-list">
+            {country.jobs.map(([title, salary, details]) => (
+              <article className="job-row" key={title}>
+                <span className="job-icon"><BriefcaseBusiness aria-hidden="true" /></span>
+                <div className="job-copy"><strong>{title}</strong><span>{details}</span></div>
+                <div className="job-salary"><small>{labels.salary}</small><strong>{salary}</strong></div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <div className="jobs-dialog-footer">
+          <p><ShieldCheck aria-hidden="true" />{labels.disclaimer}</p>
+          <DialogClose
+            render={
+              <a
+                className="button button-primary jobs-dialog-cta"
+                href="#consultation"
+                aria-label={labels.cta}
+              />
+            }
+          >
+            {labels.cta}<ArrowUpRight aria-hidden="true" />
+          </DialogClose>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }

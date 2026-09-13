@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 
 import {
-  ConsultationForm, FaqAccordion, LanguageSwitcher, MobileConsultationCta,
+  ConsultationForm, CountryJobsDialog, FaqAccordion, LanguageSwitcher, MobileConsultationCta,
 } from '@/components/site/interactive';
 import { useLocale } from '@/components/site/use-locale';
 import { siteCopy, type SiteCopy } from '@/lib/site-copy';
@@ -115,13 +115,23 @@ export default function Home() {
             {copy.directions.cards.map((direction) => {
               const visual = directionVisuals[direction.id];
               return (
-                <article className={`direction-card ${visual.className}`} key={direction.id}>
-                  <div className="direction-media">
-                    <img src={visual.image} width="1200" height="800" loading="lazy" decoding="async" alt={direction.imageAlt} />
-                    <div className="direction-card-top"><span className="direction-flag"><img src={visual.flag} width="34" height="24" alt="" aria-hidden="true" /></span><ArrowUpRight aria-hidden="true" /></div>
-                  </div>
-                  <div className="direction-copy"><h3>{direction.label}</h3><p>{direction.text}</p><div className="tag-row">{direction.tags.map((tag) => <span key={tag}>{tag}</span>)}</div></div>
-                </article>
+                <CountryJobsDialog
+                  key={direction.id}
+                  country={direction}
+                  image={visual.image}
+                  flag={visual.flag}
+                  cardClassName={visual.className}
+                  labels={{
+                    open: copy.directions.openLabel,
+                    kicker: copy.directions.dialogKicker,
+                    conditions: copy.directions.conditionsTitle,
+                    jobs: copy.directions.jobsTitle,
+                    salary: copy.directions.salaryLabel,
+                    cta: copy.directions.dialogCta,
+                    close: copy.directions.closeLabel,
+                    disclaimer: copy.directions.disclaimer,
+                  }}
+                />
               );
             })}
           </div>
