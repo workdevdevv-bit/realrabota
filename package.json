@@ -8,7 +8,8 @@
   "scripts": {
     "dev": "vinext dev",
     "build": "vinext build",
-    "start": "wrangler dev --config dist/server/wrangler.json --ip 0.0.0.0 --port ${PORT:-8787}",
+    "build:hoster": "npm run build && node scripts/prepare-hoster-build.mjs",
+    "start": "vite preview --outDir httpdocs --host 0.0.0.0",
     "test": "vitest",
     "lint": "oxlint",
     "format": "oxfmt"
@@ -35,9 +36,6 @@
     "vinext": "1.0.0-beta.5"
   },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "1.37.1",
-    "@cloudflare/workers-types": "4.20260515.1",
-    "@openai/sites-vite-plugin": "0.2.0",
     "@tailwindcss/postcss": "4.2.1",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
@@ -54,8 +52,7 @@
     "tailwindcss": "4.2.1",
     "typescript": "5.9.3",
     "vite": "8.0.13",
-    "vitest": "^5.0.0",
-    "wrangler": "4.92.0"
+    "vitest": "^5.0.0"
   },
   "type": "module"
 }
