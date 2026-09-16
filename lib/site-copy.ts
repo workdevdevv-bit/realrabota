@@ -31,7 +31,6 @@ export const siteCopy = {
     form: {
       name: 'Ваше имя',
       namePlaceholder: 'Например, Айдана',
-      phone: 'Телефон',
       direction: 'Направление',
       directionPlaceholder: 'Выберите страну',
       options: [
@@ -250,7 +249,6 @@ export const siteCopy = {
     form: {
       name: 'Атыңыз',
       namePlaceholder: 'Мысалы, Айдана',
-      phone: 'Телефон',
       direction: 'Бағыт',
       directionPlaceholder: 'Елді таңдаңыз',
       options: [

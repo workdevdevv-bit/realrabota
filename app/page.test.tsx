@@ -27,7 +27,7 @@ describe('Real Rabota landing', () => {
       screen.getByRole('link', { name: 'Получить консультацию' }),
     ).toHaveAttribute('href', '#consultation');
     expect(screen.getAllByLabelText('Ваше имя')[0]).toBeInTheDocument();
-    expect(screen.getAllByLabelText('Телефон')[0]).toBeInTheDocument();
+    expect(screen.getAllByLabelText('Направление')[0]).toBeInTheDocument();
     expect(screen.getByTestId('hero-art')).toBeInTheDocument();
   });
 
@@ -86,14 +86,13 @@ describe('Real Rabota landing', () => {
     ).toBeGreaterThan(0);
   });
 
-  it('opens a prefilled WhatsApp consultation request', async () => {
+  it('opens a prefilled WhatsApp request without asking for a phone number', async () => {
     const user = userEvent.setup();
     const fetchSpy = vi.spyOn(globalThis, 'fetch');
     const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
     render(<Home />);
 
     await user.type(screen.getAllByLabelText('Ваше имя')[0], 'Айдана');
-    await user.type(screen.getAllByLabelText('Телефон')[0], '+7 701 123 45 67');
     await user.selectOptions(screen.getAllByLabelText('Направление')[0], 'poland');
     await user.click(
       screen.getAllByRole('button', { name: 'Получить консультацию' })[0],
@@ -106,7 +105,7 @@ describe('Real Rabota landing', () => {
     const whatsappUrl = new URL(String(url));
     expect(`${whatsappUrl.origin}${whatsappUrl.pathname}`).toBe('https://wa.me/77071101533');
     expect(whatsappUrl.searchParams.get('text')).toBe(
-      'Здравствуйте! Хочу получить консультацию Real Rabota.\n\nИмя: Айдана\nТелефон: +7 701 123 45 67\nНаправление: Польша',
+      'Здравствуйте! Хочу получить консультацию Real Rabota.\n\nИмя: Айдана\nНаправление: Польша',
     );
     expect(target).toBe('_blank');
     expect(features).toBe('noopener,noreferrer');
@@ -123,12 +122,12 @@ describe('Real Rabota landing', () => {
     expect(nameFields[1]).toHaveAttribute('id', 'final-consultation-name');
   });
 
-  it('requires every consultation detail before opening WhatsApp', () => {
+  it('requires only the consultation details WhatsApp does not provide', () => {
     render(<Home />);
 
     expect(screen.getAllByLabelText('Ваше имя')[0]).toBeRequired();
-    expect(screen.getAllByLabelText('Телефон')[0]).toBeRequired();
     expect(screen.getAllByLabelText('Направление')[0]).toBeRequired();
+    expect(screen.queryByLabelText('Телефон')).not.toBeInTheDocument();
   });
 
   it('opens an FAQ answer with an accessible control', async () => {

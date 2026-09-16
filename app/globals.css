@@ -542,7 +542,7 @@ h1 span::after {
 
 .consultation-form {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr auto;
+  grid-template-columns: 1fr 1fr auto;
   align-items: end;
   gap: 9px;
 }
@@ -2553,7 +2553,7 @@ h1 span::after {
   }
 
   .consultation-form-light {
-    grid-template-columns: 1fr 1fr 1fr auto;
+    grid-template-columns: 1fr 1fr auto;
   }
 
   .journey-showcase {

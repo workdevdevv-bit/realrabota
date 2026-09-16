@@ -37,7 +37,6 @@ import type { Locale } from '@/lib/i18n';
 type FormCopy = {
   name: string;
   namePlaceholder: string;
-  phone: string;
   direction: string;
   directionPlaceholder: string;
   options: ReadonlyArray<readonly [string, string]>;
@@ -58,7 +57,6 @@ export function ConsultationForm({ copy, variant = 'dark' }: ConsultationFormPro
   const [notice, setNotice] = useState('');
   const id = variant === 'dark' ? 'hero-consultation' : 'final-consultation';
   const nameId = `${id}-name`;
-  const phoneId = `${id}-phone`;
   const directionId = `${id}-direction`;
 
   return (
@@ -68,13 +66,11 @@ export function ConsultationForm({ copy, variant = 'dark' }: ConsultationFormPro
         event.preventDefault();
         const form = event.currentTarget;
         const nameInput = form.elements.namedItem('name') as HTMLInputElement;
-        const phoneInput = form.elements.namedItem('phone') as HTMLInputElement;
         const directionSelect = form.elements.namedItem('direction') as HTMLSelectElement;
         const message = [
           copy.whatsappIntro,
           '',
           `${copy.whatsappNameLabel}: ${nameInput.value}`,
-          `${copy.phone}: ${phoneInput.value}`,
           `${copy.direction}: ${directionSelect.selectedOptions[0]?.text ?? ''}`,
         ].join('\n');
 
@@ -89,17 +85,6 @@ export function ConsultationForm({ copy, variant = 'dark' }: ConsultationFormPro
       <label htmlFor={nameId}>
         <span>{copy.name}</span>
         <Input id={nameId} name="name" autoComplete="name" placeholder={copy.namePlaceholder} required />
-      </label>
-      <label htmlFor={phoneId}>
-        <span>{copy.phone}</span>
-        <Input
-          id={phoneId}
-          name="phone"
-          type="tel"
-          autoComplete="tel"
-          placeholder="+7 (___) ___-__-__"
-          required
-        />
       </label>
       <label htmlFor={directionId}>
         <span>{copy.direction}</span>
