@@ -42,6 +42,8 @@ type FormCopy = {
   directionPlaceholder: string;
   options: ReadonlyArray<readonly [string, string]>;
   submit: string;
+  whatsappIntro: string;
+  whatsappNameLabel: string;
   notice: string;
 };
 
@@ -49,6 +51,8 @@ type ConsultationFormProps = {
   variant?: 'dark' | 'light';
   copy: FormCopy;
 };
+
+const WHATSAPP_NUMBER = '77071101533';
 
 export function ConsultationForm({ copy, variant = 'dark' }: ConsultationFormProps) {
   const [notice, setNotice] = useState('');
@@ -62,12 +66,29 @@ export function ConsultationForm({ copy, variant = 'dark' }: ConsultationFormPro
       className={`consultation-form consultation-form-${variant}`}
       onSubmit={(event) => {
         event.preventDefault();
+        const form = event.currentTarget;
+        const nameInput = form.elements.namedItem('name') as HTMLInputElement;
+        const phoneInput = form.elements.namedItem('phone') as HTMLInputElement;
+        const directionSelect = form.elements.namedItem('direction') as HTMLSelectElement;
+        const message = [
+          copy.whatsappIntro,
+          '',
+          `${copy.whatsappNameLabel}: ${nameInput.value}`,
+          `${copy.phone}: ${phoneInput.value}`,
+          `${copy.direction}: ${directionSelect.selectedOptions[0]?.text ?? ''}`,
+        ].join('\n');
+
+        window.open(
+          `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`,
+          '_blank',
+          'noopener,noreferrer',
+        );
         setNotice('shown');
       }}
     >
       <label htmlFor={nameId}>
         <span>{copy.name}</span>
-        <Input id={nameId} name="name" autoComplete="name" placeholder={copy.namePlaceholder} />
+        <Input id={nameId} name="name" autoComplete="name" placeholder={copy.namePlaceholder} required />
       </label>
       <label htmlFor={phoneId}>
         <span>{copy.phone}</span>
@@ -77,11 +98,12 @@ export function ConsultationForm({ copy, variant = 'dark' }: ConsultationFormPro
           type="tel"
           autoComplete="tel"
           placeholder="+7 (___) ___-__-__"
+          required
         />
       </label>
       <label htmlFor={directionId}>
         <span>{copy.direction}</span>
-        <NativeSelect id={directionId} name="direction" defaultValue="" className="direction-select">
+        <NativeSelect id={directionId} name="direction" defaultValue="" className="direction-select" required>
           <NativeSelectOption value="" disabled>
             {copy.directionPlaceholder}
           </NativeSelectOption>

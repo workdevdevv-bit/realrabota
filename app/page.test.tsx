@@ -86,20 +86,33 @@ describe('Real Rabota landing', () => {
     ).toBeGreaterThan(0);
   });
 
-  it('keeps the consultation form local-only', async () => {
+  it('opens a prefilled WhatsApp consultation request', async () => {
     const user = userEvent.setup();
     const fetchSpy = vi.spyOn(globalThis, 'fetch');
+    const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
     render(<Home />);
 
+    await user.type(screen.getAllByLabelText('Ваше имя')[0], 'Айдана');
+    await user.type(screen.getAllByLabelText('Телефон')[0], '+7 701 123 45 67');
+    await user.selectOptions(screen.getAllByLabelText('Направление')[0], 'poland');
     await user.click(
       screen.getAllByRole('button', { name: 'Получить консультацию' })[0],
     );
 
     expect(fetchSpy).not.toHaveBeenCalled();
-    expect(
-      screen.getByText(/Онлайн-отправка пока не подключена/),
-    ).toBeInTheDocument();
+    expect(openSpy).toHaveBeenCalledTimes(1);
+
+    const [url, target, features] = openSpy.mock.calls[0];
+    const whatsappUrl = new URL(String(url));
+    expect(`${whatsappUrl.origin}${whatsappUrl.pathname}`).toBe('https://wa.me/77071101533');
+    expect(whatsappUrl.searchParams.get('text')).toBe(
+      'Здравствуйте! Хочу получить консультацию Real Rabota.\n\nИмя: Айдана\nТелефон: +7 701 123 45 67\nНаправление: Польша',
+    );
+    expect(target).toBe('_blank');
+    expect(features).toBe('noopener,noreferrer');
+
     fetchSpy.mockRestore();
+    openSpy.mockRestore();
   });
 
   it('keeps form controls stable between server and client renders', () => {
@@ -108,6 +121,14 @@ describe('Real Rabota landing', () => {
     const nameFields = screen.getAllByLabelText('Ваше имя');
     expect(nameFields[0]).toHaveAttribute('id', 'hero-consultation-name');
     expect(nameFields[1]).toHaveAttribute('id', 'final-consultation-name');
+  });
+
+  it('requires every consultation detail before opening WhatsApp', () => {
+    render(<Home />);
+
+    expect(screen.getAllByLabelText('Ваше имя')[0]).toBeRequired();
+    expect(screen.getAllByLabelText('Телефон')[0]).toBeRequired();
+    expect(screen.getAllByLabelText('Направление')[0]).toBeRequired();
   });
 
   it('opens an FAQ answer with an accessible control', async () => {
