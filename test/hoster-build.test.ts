@@ -28,7 +28,12 @@ describe('Hoster.kz static build', () => {
 
     const head = html.match(/<head>([\s\S]*?)<\/head>/)?.[1];
     expect(head).toBeDefined();
-    expect(head?.match(/googletagmanager\.com\/gtag\/js\?id=G-14Y2CNFXE0/g)).toHaveLength(1);
-    expect(head?.match(/gtag\('config', 'G-14Y2CNFXE0'\)/g)).toHaveLength(1);
+    expect(head?.match(/googletagmanager\.com\/gtm\.js\?id=/g)).toHaveLength(1);
+    expect(head?.match(/GTM-PSMH8655/g)).toHaveLength(1);
+    expect(html).toMatch(
+      /<body[^>]*><noscript><iframe src="https:\/\/www\.googletagmanager\.com\/ns\.html\?id=GTM-PSMH8655"[^>]*><\/iframe><\/noscript><main/,
+    );
+    expect(html).not.toContain('googletagmanager.com/gtag/js?id=G-14Y2CNFXE0');
+    expect(html).not.toContain("gtag('config', 'G-14Y2CNFXE0')");
   }, 30_000);
 });
