@@ -25,5 +25,10 @@ describe('Hoster.kz static build', () => {
     expect(html).toContain('<!DOCTYPE html>');
     expect(html).toContain('Real Rabota');
     expect(html).toMatch(/_next\/static\/[^"']+\.js/);
+
+    const head = html.match(/<head>([\s\S]*?)<\/head>/)?.[1];
+    expect(head).toBeDefined();
+    expect(head?.match(/googletagmanager\.com\/gtag\/js\?id=G-14Y2CNFXE0/g)).toHaveLength(1);
+    expect(head?.match(/gtag\('config', 'G-14Y2CNFXE0'\)/g)).toHaveLength(1);
   }, 30_000);
 });
